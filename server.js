@@ -109,12 +109,9 @@ if (cluster.isMaster) {
     //     res.json(chatHistory);
     // });
 
-
-
+}
 
 app.listen(port ,() => {
     console.log("Server running with custom domain on AWS Amplify");
 });
-
-}
 
