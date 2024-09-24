@@ -12,7 +12,7 @@ const NodeCache = require( "node-cache" );
 const app = express();
 const port = process.env.PORT || 4000;
 
-const myCache = new NodeCache({stdTTL:60})
+const myCache = new NodeCache()
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
@@ -65,6 +65,7 @@ const Product = mongoose.models.userinfo || mongoose.model("userinfo", schema);
                 const token = jwt.sign({ data },process.env.KEY);
                 const newProduct = new Product(data);
                 await newProduct.save();
+                myCache.del("productss");
                 return res.json({ "success": true, "token": token });
             }
         } catch (error) {
