@@ -10,7 +10,7 @@ const compression=require("compression")
 const NodeCache = require( "node-cache" );
 
 const app = express();
-const port = process.env.PORT || 9000
+const port = process.env.PORT || 4000;
 
 const myCache = new NodeCache({stdTTL:60})
 
@@ -28,6 +28,13 @@ app.use(compression(
             }
 
     }))
+
+app.use((err, req, res, next) => {
+        console.error(err.stack);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Internal Server Error', message: err.message });
+        }
+    });
 
 
 
@@ -47,23 +54,15 @@ const schema = new mongoose.Schema({
 const Product = mongoose.models.userinfo || mongoose.model("userinfo", schema);
 // let chatHistory = [];
 
-if (cluster.isMaster) {
-    for (let i = 0; i < os ; i++) {
-        cluster.fork();
-    }
-}else{
-
     app.post("/login", async (req, res) => {
         try { 
             const data = req.body;
             const existingUser = await Product.findOne({ email: data.email });
     
-            if (data.name == "" || data.lastName == "" || data.email == "") {
-                return res.json({"valueerror": true});
-            } else if (existingUser) {
+             if (existingUser) {
                 return res.json({ "erroremail": true });
             } else {
-                const token = jwt.sign({ data }, process.env.KEY);
+                const token = jwt.sign({ data },process.env.KEY);
                 const newProduct = new Product(data);
                 await newProduct.save();
                 return res.json({ "success": true, "token": token });
@@ -80,7 +79,7 @@ if (cluster.isMaster) {
                 datas=JSON.parse(myCache.get("productss"));
             }else{
 
-                datas = await Product.aggregate([
+                datas = await Product.aggregate([ 
                     { $project: { email: 1, _id: 0 }},
                     { $sort: { email: 1 }}
                 ]);
@@ -109,9 +108,12 @@ if (cluster.isMaster) {
     //     res.json(chatHistory);
     // });
 
-}
+
+
+
 
 app.listen(port ,() => {
     console.log("Server running with custom domain on AWS Amplify");
 });
+
 
