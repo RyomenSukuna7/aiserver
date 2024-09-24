@@ -55,7 +55,7 @@ const Product = mongoose.models.userinfo || mongoose.model("userinfo", schema);
 
     app.post("/login", async (req, res) => {
         try { 
-            const data = req.body;
+            const data = await req.body;
             const existingUser = await Product.findOne({ email: data.email });
     
              if (existingUser) {
