@@ -1,7 +1,5 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cluster = require("cluster");
-const path = require('path');
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
@@ -16,9 +14,6 @@ const port = process.env.PORT || 9000
 
 const myCache = new NodeCache({stdTTL:60})
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
