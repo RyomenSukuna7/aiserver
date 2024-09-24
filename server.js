@@ -12,7 +12,6 @@ const NodeCache = require( "node-cache" );
 const app = express();
 const port = process.env.PORT || 4000;
 
-const myCache = new NodeCache()
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
@@ -65,7 +64,6 @@ const Product = mongoose.models.userinfo || mongoose.model("userinfo", schema);
                 const token = jwt.sign({ data },process.env.KEY);
                 const newProduct = new Product(data);
                 await newProduct.save();
-                myCache.del("productss");
                 return res.json({ "success": true, "token": token });
             }
         } catch (error) {
@@ -74,20 +72,13 @@ const Product = mongoose.models.userinfo || mongoose.model("userinfo", schema);
     });
     
     app.get("/apiDB", async (req, res) => {
-        let datas;
         try {
-            if(myCache.has("productss")){
-                datas=JSON.parse(myCache.get("productss"));
-            }else{
+            
 
-                datas = await Product.aggregate([ 
+                const datas = await Product.aggregate([ 
                     { $project: { email: 1, _id: 0 }},
                     { $sort: { email: 1 }}
                 ]);
-
-                myCache.set("productss",JSON.stringify(datas));
-
-            }
             res.json(datas);
         } catch (error) {
             res.status(500).json({ error: "Failed to retrieve data", details: error.message });
