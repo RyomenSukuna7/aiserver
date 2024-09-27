@@ -90,7 +90,7 @@ const Product = mongoose.models.userinfo || mongoose.model("userinfo", schema);
         const data = await req.body;
         const existingUser = await Product.findOne({ email: data.email });
         if(existingUser){
-            return res.json({"userData":existingUser.email});
+            return res.json({"userData":true});
         }
 
     })
